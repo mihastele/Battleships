@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Battleships - Test Page</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-section {
+        background: white;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .warning {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      pre {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 4px;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🚢 Battleships - System Test</h1>
+
+    <div class="test-section">
+      <h2>🔧 System Check</h2>
+      <div id="browser-check" class="status">
+        Checking browser compatibility...
+      </div>
+      <div id="websocket-check" class="status">
+        Checking WebSocket support...
+      </div>
+      <div id="storage-check" class="status">Checking local storage...</div>
+    </div>
+
+    <div class="test-section">
+      <h2>🌐 Server Connection Test</h2>
+      <div id="server-status" class="status">Not connected</div>
+      <button onclick="testServerConnection()">Test Server Connection</button>
+      <button onclick="startServer()">Launch Server (if installed)</button>
+    </div>
+
+    <div class="test-section">
+      <h2>🎮 Game Test</h2>
+      <p>Click the button below to test the game in a new window:</p>
+      <button onclick="openGame()">Open Game</button>
+      <button onclick="openMultipleGames()">
+        Open Two Game Windows (Test Multiplayer)
+      </button>
+    </div>
+
+    <div class="test-section">
+      <h2>📋 Game Protocol Test</h2>
+      <button onclick="testProtocol()">Test Message Protocol</button>
+      <div id="protocol-result"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>📖 Setup Instructions</h2>
+      <ol>
+        <li>
+          <strong>Install Node.js:</strong> Download from
+          <a href="https://nodejs.org" target="_blank">nodejs.org</a>
+        </li>
+        <li>
+          <strong>Install Dependencies:</strong> Run <code>npm install</code> in
+          the project directory
+        </li>
+        <li>
+          <strong>Start Server:</strong> Run <code>npm start</code> or use the
+          start.bat/start.sh script
+        </li>
+        <li>
+          <strong>Open Game:</strong> Open <code>index.html</code> in your
+          browser
+        </li>
+        <li>
+          <strong>Test Multiplayer:</strong> Open the game in two browser
+          tabs/windows
+        </li>
+      </ol>
+    </div>
+
+    <div class="test-section">
+      <h2>🐛 Troubleshooting</h2>
+      <details>
+        <summary><strong>Connection Issues</strong></summary>
+        <ul>
+          <li>Ensure the server is running on port 8080</li>
+          <li>Check if another application is using port 8080</li>
+          <li>Try restarting the server</li>
+          <li>Check browser console for error messages</li>
+        </ul>
+      </details>
+
+      <details>
+        <summary><strong>Ship Placement Issues</strong></summary>
+        <ul>
+          <li>Right-click to rotate ships</li>
+          <li>Ensure ships don't overlap</li>
+          <li>Ships must fit within the 10x10 grid</li>
+          <li>Try the "Random Placement" button</li>
+        </ul>
+      </details>
+
+      <details>
+        <summary><strong>Game Not Starting</strong></summary>
+        <ul>
+          <li>Both players must complete ship placement</li>
+          <li>Refresh both browser windows and reconnect</li>
+          <li>Check server console for error messages</li>
+        </ul>
+      </details>
+    </div>
+
+    <script>
+      // System checks
+      function runSystemChecks() {
+        // Browser compatibility
+        const browserCheck = document.getElementById("browser-check");
+        if (typeof WebSocket !== "undefined" && typeof JSON !== "undefined") {
+          browserCheck.textContent = "✅ Browser is compatible";
+          browserCheck.className = "status success";
+        } else {
+          browserCheck.textContent = "❌ Browser is not compatible";
+          browserCheck.className = "status error";
+        }
+
+        // WebSocket support
+        const wsCheck = document.getElementById("websocket-check");
+        if (typeof WebSocket !== "undefined") {
+          wsCheck.textContent = "✅ WebSocket support available";
+          wsCheck.className = "status success";
+        } else {
+          wsCheck.textContent = "❌ WebSocket not supported";
+          wsCheck.className = "status error";
+        }
+
+        // Local storage
+        const storageCheck = document.getElementById("storage-check");
+        try {
+          localStorage.setItem("test", "test");
+          localStorage.removeItem("test");
+          storageCheck.textContent = "✅ Local storage available";
+          storageCheck.className = "status success";
+        } catch (e) {
+          storageCheck.textContent = "⚠️ Local storage not available";
+          storageCheck.className = "status warning";
+        }
+      }
+
+      function testServerConnection() {
+        const statusDiv = document.getElementById("server-status");
+        statusDiv.textContent = "Connecting...";
+        statusDiv.className = "status warning";
+
+        const ws = new WebSocket("ws://localhost:8080");
+
+        ws.onopen = () => {
+          statusDiv.textContent = "✅ Server connection successful";
+          statusDiv.className = "status success";
+          ws.close();
+        };
+
+        ws.onerror = () => {
+          statusDiv.textContent =
+            "❌ Cannot connect to server (is it running?)";
+          statusDiv.className = "status error";
+        };
+
+        ws.onclose = () => {
+          if (statusDiv.textContent.includes("successful")) return;
+          statusDiv.textContent = "❌ Connection failed";
+          statusDiv.className = "status error";
+        };
+
+        // Timeout after 5 seconds
+        setTimeout(() => {
+          if (ws.readyState === WebSocket.CONNECTING) {
+            ws.close();
+            statusDiv.textContent = "❌ Connection timeout";
+            statusDiv.className = "status error";
+          }
+        }, 5000);
+      }
+
+      function startServer() {
+        alert(
+          "To start the server manually:\\n\\n1. Open a terminal/command prompt\\n2. Navigate to the project directory\\n3. Run: npm start\\n\\nOr use the provided start.bat (Windows) or start.sh (Mac/Linux) scripts."
+        );
+      }
+
+      function openGame() {
+        window.open("index.html", "_blank");
+      }
+
+      function openMultipleGames() {
+        window.open("index.html", "_blank");
+        setTimeout(() => {
+          window.open("index.html", "_blank");
+        }, 1000);
+      }
+
+      function testProtocol() {
+        const resultDiv = document.getElementById("protocol-result");
+
+        const sampleMessages = {
+          join_game: { type: "join_game", playerName: "TestPlayer" },
+          setup_complete: {
+            type: "setup_complete",
+            ships: [
+              {
+                type: "destroyer",
+                positions: [
+                  [0, 0],
+                  [0, 1],
+                ],
+              },
+              {
+                type: "submarine",
+                positions: [
+                  [2, 0],
+                  [2, 1],
+                  [2, 2],
+                ],
+              },
+            ],
+          },
+          fire: { type: "fire", coordinates: [5, 3] },
+        };
+
+        resultDiv.innerHTML =
+          "<h4>Sample Protocol Messages:</h4><pre>" +
+          JSON.stringify(sampleMessages, null, 2) +
+          "</pre>";
+      }
+
+      // Run system checks on page load
+      runSystemChecks();
+    </script>
+  </body>
+</html>

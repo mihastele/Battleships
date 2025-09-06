@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Battleships - Real-time Online Game</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- Connection Screen -->
+      <div id="connection-screen" class="screen active">
+        <div class="connection-form">
+          <h1>Battleships</h1>
+          <input
+            type="text"
+            id="player-name"
+            placeholder="Enter your name"
+            maxlength="20"
+          />
+          <button id="join-game">Join Game</button>
+          <div id="connection-status">Disconnected</div>
+        </div>
+      </div>
+
+      <!-- Waiting Screen -->
+      <div id="waiting-screen" class="screen">
+        <div class="waiting-content">
+          <h2>Waiting for opponent...</h2>
+          <div class="spinner"></div>
+          <p>You'll be matched with another player shortly.</p>
+        </div>
+      </div>
+
+      <!-- Setup Phase Screen -->
+      <div id="setup-screen" class="screen">
+        <div class="setup-content">
+          <h2>Place Your Ships</h2>
+          <div class="setup-info">
+            <p>Drag ships onto your board or click to place them.</p>
+            <p>Right-click to rotate ships.</p>
+          </div>
+
+          <div class="setup-layout">
+            <div class="ship-dock">
+              <h3>Ships to Place</h3>
+              <div class="ships-container">
+                <div class="ship-item" data-ship="carrier" data-length="5">
+                  <div class="ship-visual carrier">
+                    <div class="ship-segment"></div>
+                    <div class="ship-segment"></div>
+                    <div class="ship-segment"></div>
+                    <div class="ship-segment"></div>
+                    <div class="ship-segment"></div>
+                  </div>
+                  <span>Carrier (5)</span>
+                </div>
+                <div class="ship-item" data-ship="battleship" data-length="4">
+                  <div class="ship-visual battleship">
+                    <div class="ship-segment"></div>
+                    <div class="ship-segment"></div>
+                    <div class="ship-segment"></div>
+                    <div class="ship-segment"></div>
+                  </div>
+                  <span>Battleship (4)</span>
+                </div>
+                <div class="ship-item" data-ship="cruiser" data-length="3">
+                  <div class="ship-visual cruiser">
+                    <div class="ship-segment"></div>
+                    <div class="ship-segment"></div>
+                    <div class="ship-segment"></div>
+                  </div>
+                  <span>Cruiser (3)</span>
+                </div>
+                <div class="ship-item" data-ship="submarine" data-length="3">
+                  <div class="ship-visual submarine">
+                    <div class="ship-segment"></div>
+                    <div class="ship-segment"></div>
+                    <div class="ship-segment"></div>
+                  </div>
+                  <span>Submarine (3)</span>
+                </div>
+                <div class="ship-item" data-ship="destroyer" data-length="2">
+                  <div class="ship-visual destroyer">
+                    <div class="ship-segment"></div>
+                    <div class="ship-segment"></div>
+                  </div>
+                  <span>Destroyer (2)</span>
+                </div>
+              </div>
+              <button id="random-placement">Random Placement</button>
+              <button id="setup-complete" disabled>Ready to Play</button>
+            </div>
+
+            <div class="setup-board-container">
+              <h3>Your Board</h3>
+              <div id="setup-board" class="game-board"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Screen -->
+      <div id="game-screen" class="screen">
+        <div class="game-header">
+          <div class="game-info">
+            <div class="player-info">
+              <h3 id="player-display">Player</h3>
+              <div id="game-status">Game Starting...</div>
+            </div>
+            <div class="opponent-info">
+              <h3 id="opponent-display">Opponent</h3>
+              <div id="turn-indicator">Waiting...</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="game-boards">
+          <div class="board-section">
+            <h3>Your Fleet</h3>
+            <div id="player-board" class="game-board"></div>
+          </div>
+
+          <div class="board-section">
+            <h3>Enemy Waters</h3>
+            <div id="opponent-board" class="game-board targeting"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game End Screen -->
+      <div id="game-end-screen" class="screen">
+        <div class="game-end-content">
+          <h2 id="game-result">Game Over</h2>
+          <p id="game-result-message"></p>
+          <button id="play-again">Play Again</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container"></div>
+
+    <script src="battleships-agent.js"></script>
+  </body>
+</html>
